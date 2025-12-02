@@ -18,21 +18,23 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// ⭐ FIXED CORS (Allows Vercel Frontend + Localhost)
+// ⭐ FIXED CORS FOR DEPLOYMENT
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://one-cart-bay.vercel.app"   // ← your deployed frontend
+      "https://one-cart-bay.vercel.app"   // Your Vercel domain
     ],
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
   })
 );
 
-// ⭐ REQUIRED FOR COOKIES
+// ⭐ MUST BE BELOW CORS
+app.options("*", cors());
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
