@@ -18,24 +18,38 @@ const port = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cookieParser());
 
-// ⭐ WORKING CORS FOR LOCAL + VEREL + RENDER
+// Add all front-end origins you will use here:
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://one-cart-bay.vercel.app",
+  "https://your-other-frontend.example.com" // add if any
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "https://one-cart-bay.vercel.app"
-    ],
+    origin: function (origin, callback) {
+      // allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('CORS policy: origin not allowed'), false);
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
 
-// REQUIRED FOR COOKIES
+// REQUIRED FOR COOKIES (some browsers need these response headers)
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
+  // Do NOT set Access-Control-Allow-Origin to '*' if you use credentials
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   next();
 });
 
@@ -47,6 +61,6 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/order", orderRoutes);
 
 app.listen(port, () => {
-  console.log("Server running...");
+  console.log(`Server running on port ${port}...`);
   connectDb();
 });
