@@ -3,7 +3,7 @@ import React, { createContext } from "react";
 export const authDataContext = createContext();
 
 function AuthContext({ children }) {
-  // 🟢 Use deployed backend URL
+  // Backend already deployed → correct!
   const serverUrl = "https://onecart-backend-ag6p.onrender.com";
 
   return (
