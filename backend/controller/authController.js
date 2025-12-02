@@ -3,10 +3,11 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import { genToken, genToken1 } from "../config/token.js";
 
+// ✔ FINAL DEPLOYMENT COOKIE SETTINGS
 const cookieOptions = {
   httpOnly: true,
-  secure: false,      // localhost is NOT https
-  sameSite: "Lax",
+  secure: true,        // Render is HTTPS → MUST be true
+  sameSite: "None",    // Cross-site cookie → MUST be None
   maxAge: 7 * 24 * 60 * 60 * 1000
 };
 
@@ -64,8 +65,8 @@ export const logOut = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "Lax"
+      secure: true,
+      sameSite: "None"
     });
 
     return res.status(200).json({ message: "Logout successful" });
@@ -101,8 +102,8 @@ export const adminLogin = async (req, res) => {
 
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false,
-        sameSite: "Lax",
+        secure: true,
+        sameSite: "None",
         maxAge: 24 * 60 * 60 * 1000
       });
 
